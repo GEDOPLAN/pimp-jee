@@ -63,7 +63,7 @@
   <profiles>
 
     <!--
-    Demo profile for upgrading the sources from JEE 8 to JEE 9+
+    Profile for upgrading the sources from JEE 8 to JEE 9+
     Run it with mvn -PtoJakarta rewrite:run
 
     After the upgrade, adjust this file by
@@ -97,7 +97,7 @@
     </profile>
 
     <!--
-    Demo profile for using WildFly Bootable Jar
+    Profile for using WildFly Bootable Jar
     
     For building an additional WildFly hollow jar, run mvn -PwflyJar package,
     and start the application with java -jar target/wildfly-bootable.jar -&#45;deployment=target/pimp-jee.war.
