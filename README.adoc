@@ -1,37 +1,66 @@
-= Demo project for OpenRewrite
+= Demo project for the talk "Pimp your Jakarta EE application"
 
+Starting point::
++
 This project builds a small JEE application composed of a REST api, some (CDI) injected services and a JPA based persistence layer.
-
-You can build and run the application with WildFly Bootable Jar:
-
++
+You can build the application with
++
 [source, shell]
 ----
-mvn wildfly-jar:dev-watch
+mvn package
 ----
-
++
+and deploy it in some Java EE 8 application server, e. g. WildFly 26.
++
 The small REST api includes an endpoint for retrieving all `Person` objects from the database:
-
++
 [source, shell]
 ----
 curl localhost:8080/api/persons
 ----
-
++
 The in-memory db is populated with a few test entries.
 
-For upgrading the application from JEE 8 to JEE 10, the `pom.xml` includes a configuration of the OpenRewrite plugin. For clarity it has been placed into a Maven profile. Run it by
+---
 
+Migrate from Java EE 8 to Jakarta EE 10::
++
+For upgrading the application from JEE 8 to JEE 10, the `pom.xml` includes a configuration of the OpenRewrite plugin. For clarity in this demo it has been placed into a Maven profile. Run it by
++
 [source, shell]
 ----
 mvn -PtoJakarta rewrite:run
 ----
-
++
 You have to adjust `pom.xml` afterwards - please see the comment on top of the profile definition.
++
+You may now deploy the application in an Jakarta EE 10 server, e. g. WildFly 29.
 
-Now `mvn wildfly-jar:dev-watch` will execute the upgraded application in WildFly 27!
+---
 
-In order to check if all necessary package name changes have been made, another Maven profile is included. Activate it by
-
+Use a "Jar" server runtime::
++
+WildFly can be provisioned as bootable jar by means of the WildFly JAR Maven Plugin. For clarity in this demo it has been placed into a Maven profile. Use
++
 [source, shell]
 ----
-mvn -PbanJavax
+mvn -PwflyJar package
 ----
++
+to download, customize and preconfigure a WildFly server into `target/wildfly-bootable.jar` consisting of layers for REST, CDI, JPA and H2 as default datasource. The combined application and server can be started with
++
+[source, shell]
+----
+java -jar target/wildfly-bootable.jar --deployment=target/pimp-jee.war
+----
++
+This is using a hollow jar, i. e. the server jar contains just the server part and not the deployment. You can build a fat jar containing both by configuring the plugin with `<hollow-jar>false</hollow-jar>`.
++
+The plugin offers a development mode with hot reloading changes:
++
+[source, shell]
+----
+mvn -PwflyJar wildfly-jar:dev-watch
+----
+

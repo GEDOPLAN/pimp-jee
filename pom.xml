@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -20,9 +18,6 @@
 
   <properties>
     <java.code.version>17</java.code.version>
-
-    <wildfly.bootable.jar.version>10.0.0.Final</wildfly.bootable.jar.version>
-    <wildfly.version>26.1.2.Final</wildfly.version>
   </properties>
 
   <repositories>
@@ -40,6 +35,18 @@
       <scope>provided</scope>
     </dependency>
 
+    <!--
+      After migrating to Jakarta EE:
+      - remove all javax and jakarta dependencies above
+      - activate the jakarta platfrom dependency below
+    <dependency>
+      <groupId>jakarta.platform</groupId>
+      <artifactId>jakarta.jakartaee-api</artifactId>
+      <version>10.0.0</version>
+      <scope>provided</scope>
+    </dependency>
+    -->
+
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
@@ -51,119 +58,17 @@
   <build>
     <defaultGoal>package</defaultGoal>
     <finalName>${project.artifactId}</finalName>
-
-    <plugins>
-      <plugin>
-        <groupId>org.wildfly.plugins</groupId>
-        <artifactId>wildfly-jar-maven-plugin</artifactId>
-        <version>${wildfly.bootable.jar.version}</version>
-        <configuration>
-          <feature-packs>
-            <feature-pack>
-              <location>wildfly@maven(org.jboss.universe:community-universe)#${wildfly.version}</location>
-            </feature-pack>
-            <feature-pack>
-              <groupId>org.wildfly</groupId>
-              <artifactId>wildfly-datasources-galleon-pack</artifactId>
-              <version>2.2.5.Final</version>
-            </feature-pack>
-          </feature-packs>
-          <layers>
-            <layer>jaxrs</layer>
-            <layer>cdi</layer>
-            <layer>jpa</layer>
-            <layer>h2-default-datasource</layer>
-          </layers>
-          <excluded-layers>
-            <layer>deployment-scanner</layer>
-          </excluded-layers>
-          <plugin-options>
-            <jboss-maven-dist/>
-          </plugin-options>
-          <hollow-jar>true</hollow-jar>
-          <output-file-name>wildfly-bootable.jar</output-file-name>
-        </configuration>
-      </plugin>
-    </plugins>
   </build>
 
   <profiles>
-
-    <!--
-    Demo profile for enforcing the absence of old JEE imports
-    Include it in the build by mvn -PbanJavx ...
-    -->
-    <profile>
-      <id>banJavax</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-enforcer-plugin</artifactId>
-            <dependencies>
-              <dependency>
-                <groupId>de.skuzzle.enforcer</groupId>
-                <artifactId>restrict-imports-enforcer-rule</artifactId>
-                <version>2.0.0</version>
-              </dependency>
-            </dependencies>
-            <executions>
-              <execution>
-                <id>Ban Java EE imports</id>
-                <phase>process-sources</phase>
-                <goals>
-                  <goal>enforce</goal>
-                </goals>
-                <configuration>
-                  <rules>
-                    <RestrictImports>
-                      <reason>Use jakarta.* imports</reason>
-                      <bannedImports>
-                        <bannedImport>javax.activation.**</bannedImport>
-                        <bannedImport>javax.annotation.**</bannedImport>
-                        <bannedImport>javax.batch.**</bannedImport>
-                        <bannedImport>javax.validation.**</bannedImport>
-                        <bannedImport>javax.decorator.**</bannedImport>
-                        <bannedImport>javax.ejb.**</bannedImport>
-                        <bannedImport>javax.el.**</bannedImport>
-                        <bannedImport>javax.enterprise.**</bannedImport>
-                        <bannedImport>javax.faces.**</bannedImport>
-                        <bannedImport>javax.inject.**</bannedImport>
-                        <bannedImport>javax.interceptor.**</bannedImport>
-                        <bannedImport>javax.jms.**</bannedImport>
-                        <bannedImport>javax.json.**</bannedImport>
-                        <bannedImport>javax.jws.**</bannedImport>
-                        <bannedImport>javax.mail.**</bannedImport>
-                        <bannedImport>javax.persistence.**</bannedImport>
-                        <bannedImport>javax.resource.**</bannedImport>
-                        <bannedImport>javax.security.**</bannedImport>
-                        <bannedImport>javax.servlet.**</bannedImport>
-                        <bannedImport>javax.transaction.**</bannedImport>
-                        <bannedImport>javax.websocket.**</bannedImport>
-                        <bannedImport>javax.ws.**</bannedImport>
-                        <bannedImport>javax.xml.bind.**</bannedImport>
-                        <bannedImport>javax.soap.**</bannedImport>
-                        <bannedImport>javax.xml.ws.**</bannedImport>
-                      </bannedImports>
-                    </RestrictImports>
-                  </rules>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
 
     <!--
     Demo profile for upgrading the sources from JEE 8 to JEE 9+
     Run it with mvn -PtoJakarta rewrite:run
 
     After the upgrade, adjust this file by
-    - changing the version of jakarta.jakartaee-api to 10.0.0
+    - including the dependency jakarta.jakartaee-api to 10.0.0
     - removing all other jakarta.* dependencies
-    - adding <qualifier>jakarta</qualifier> to the PrimeFaces dependency
-    - changing wildfly.version to 27.0.0.Final
     -->
     <profile>
       <id>toJakarta</id>
@@ -188,6 +93,63 @@
             </dependencies>
           </plugin>
         </plugins>
+      </build>
+    </profile>
+
+    <!--
+    Demo profile for using WildFly Bootable Jar
+    
+    For building an additional WildFly hollow jar, run mvn -PwflyJar package,
+    and start the application with java -jar target/wildfly-bootable.jar -&#45;deployment=target/pimp-jee.war.
+
+    Alternativly run the application in Dev Mode: mvn -pwflyJar wildfly-jar:dev-watch.
+
+    Note: WildFly 29 is a Jakarta EE 10 server, so you must migrate the project first!
+    -->
+    <profile>
+      <id>wflyJar</id>
+      <properties>
+        <wildfly.bootable.jar.version>10.0.0.Final</wildfly.bootable.jar.version>
+        <wildfly.version>29.0.1.Final</wildfly.version>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.wildfly.plugins</groupId>
+            <artifactId>wildfly-jar-maven-plugin</artifactId>
+            <version>${wildfly.bootable.jar.version}</version>
+            <configuration>
+              <feature-packs>
+                <feature-pack>
+                  <location>wildfly@maven(org.jboss.universe:community-universe)#${wildfly.version}</location>
+                </feature-pack>
+              </feature-packs>
+              <layers>
+                <layer>jaxrs</layer>
+                <layer>cdi</layer>
+                <layer>jpa</layer>
+                <layer>h2-default-datasource</layer>
+              </layers>
+              <excluded-layers>
+                <layer>deployment-scanner</layer>
+              </excluded-layers>
+              <plugin-options>
+                <jboss-maven-dist/>
+              </plugin-options>
+              <hollow-jar>true</hollow-jar>
+              <output-file-name>wildfly-bootable.jar</output-file-name>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>package</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+
       </build>
     </profile>
   </profiles>
