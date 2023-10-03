@@ -39,13 +39,13 @@ You may now deploy the application in an Jakarta EE 10 server, e. g. WildFly 29.
 
 ---
 
-Use a "Jar" server runtime::
+Use WildFly as "Jar" Server Runtime::
 +
 WildFly can be provisioned as bootable jar by means of the WildFly JAR Maven Plugin. For clarity in this demo it has been placed into a Maven profile. Use
 +
 [source, shell]
 ----
-mvn -PwflyJar package
+mvn -Pwildfly package
 ----
 +
 to download, customize and preconfigure a WildFly server into `target/wildfly-bootable.jar` consisting of layers for REST, CDI, JPA and H2 as default datasource. The combined application and server can be started with
@@ -61,6 +61,31 @@ The plugin offers a development mode with hot reloading changes:
 +
 [source, shell]
 ----
-mvn -PwflyJar wildfly-jar:dev-watch
+mvn -Pwildfly wildfly-jar:dev-watch
+----
+
+---
+
+Use Quarkus as "Micro" Server Runtime::
++
+Standard JEE sources can be used with Quarkus to build an optimized server application. For clarity in this demo it has been placed into a Maven profile. Use
++
+[source, shell]
+----
+mvn -Pquarkus package
+----
++
+to build and package the application as jar file with dependencies in `target/quarkus-app`. The application can be started with
++
+[source, shell]
+----
+java -jar target/quarkus-app/quarkus-run.jar
+----
++
+The plugin offers a development mode with hot reloading changes:
++
+[source, shell]
+----
+mvn -Pquarkus quarkus:dev
 ----
 

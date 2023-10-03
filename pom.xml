@@ -14,9 +14,14 @@
   <artifactId>pimp-jee</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <packaging>war</packaging>
+  <!--
+    We are switching the maven packaging type from war (default) to jar in quarkus profile.
+  -->
+  <packaging>${packaging.type}</packaging>
 
   <properties>
+    <packaging.type>war</packaging.type>
+
     <java.code.version>17</java.code.version>
   </properties>
 
@@ -67,7 +72,7 @@
     Run it with mvn -PtoJakarta rewrite:run
 
     After the upgrade, adjust this file by
-    - including the dependency jakarta.jakartaee-api to 10.0.0
+    - including the jakarta.jakartaee-api dependency
     - removing all other jakarta.* dependencies
     -->
     <profile>
@@ -99,15 +104,15 @@
     <!--
     Profile for using WildFly Bootable Jar
     
-    For building an additional WildFly hollow jar, run mvn -PwflyJar package,
+    For building an additional WildFly hollow jar, run mvn -pwildfly package,
     and start the application with java -jar target/wildfly-bootable.jar -&#45;deployment=target/pimp-jee.war.
 
-    Alternativly run the application in Dev Mode: mvn -pwflyJar wildfly-jar:dev-watch.
+    Alternativly run the application in Dev Mode: mvn -pwildfly wildfly-jar:dev-watch.
 
     Note: WildFly 29 is a Jakarta EE 10 server, so you must migrate the project first!
     -->
     <profile>
-      <id>wflyJar</id>
+      <id>wildfly</id>
       <properties>
         <wildfly.bootable.jar.version>10.0.0.Final</wildfly.bootable.jar.version>
         <wildfly.version>29.0.1.Final</wildfly.version>
@@ -150,6 +155,130 @@
           </plugin>
         </plugins>
 
+      </build>
+    </profile>
+
+    <!--
+    Profile for using Quarkus.
+    
+    For building the application, run mvn -Pquarkus package,
+    and start the application with java -jar target/quarkus-app/quarkus-run.jar.
+
+    Alternativly run the application in Dev Mode: mvn -pwildfly quarkus:dev.
+
+    Note: Quarkus 3 uses JEE 10 libraries, so you must migrate the project first!
+    -->
+    <profile>
+      <id>quarkus</id>
+      <properties>
+        <packaging.type>jar</packaging.type>
+
+        <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
+        <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
+        <quarkus.platform.version>3.4.1</quarkus.platform.version>
+
+        <failsafe.useModulePath>false</failsafe.useModulePath>
+        <skipITs>true</skipITs>
+      </properties>
+      <dependencyManagement>
+        <dependencies>
+          <dependency>
+            <groupId>${quarkus.platform.group-id}</groupId>
+            <artifactId>${quarkus.platform.artifact-id}</artifactId>
+            <version>${quarkus.platform.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+          </dependency>
+        </dependencies>
+      </dependencyManagement>
+      <dependencies>
+        <dependency>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-resteasy-reactive-jsonb</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-arc</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-hibernate-orm</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-jdbc-postgresql</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-junit5</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>io.rest-assured</groupId>
+          <artifactId>rest-assured</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>${quarkus.platform.group-id}</groupId>
+            <artifactId>quarkus-maven-plugin</artifactId>
+            <version>${quarkus.platform.version}</version>
+            <extensions>true</extensions>
+            <configuration>
+              <systemProperties>
+                <!--
+                This system property is necessary only because we are switching the maven packaging type
+                from war (default) to jar.
+                See https://github.com/quarkusio/quarkus/issues/9727
+                -->
+                <quarkus.bootstrap.effective-model-builder>true</quarkus.bootstrap.effective-model-builder>
+              </systemProperties>
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>build</goal>
+                  <goal>generate-code</goal>
+                  <goal>generate-code-tests</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <systemPropertyVariables>
+                <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                <maven.home>${maven.home}</maven.home>
+                <maven.repo>${settings.localRepository}</maven.repo>
+                <!--
+                This system property is necessary only because we are switching the maven packaging type
+                from war (default) to jar.
+                See https://github.com/quarkusio/quarkus/issues/9727
+                -->
+                <quarkus.bootstrap.effective-model-builder>true</quarkus.bootstrap.effective-model-builder>
+              </systemPropertyVariables>
+            </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <systemPropertyVariables>
+                <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                <maven.home>${maven.home}</maven.home>
+                <maven.repo>${settings.localRepository}</maven.repo>
+                <!--
+                This system property is necessary only because we are switching the maven packaging type
+                from war (default) to jar.
+                See https://github.com/quarkusio/quarkus/issues/9727
+                -->
+                <quarkus.bootstrap.effective-model-builder>true</quarkus.bootstrap.effective-model-builder>
+              </systemPropertyVariables>
+            </configuration>
+          </plugin>
+        </plugins>
       </build>
     </profile>
   </profiles>
