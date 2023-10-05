@@ -295,5 +295,19 @@
         </plugins>
       </build>
     </profile>
+
+    <!--
+    Profile for building a Quarkus native application.
+
+    This requires the quarkus profile as well, so the command for building is
+    mvn -Pquarkus,native
+    -->
+    <profile>
+      <id>native</id>
+      <properties>
+        <quarkus.package.type>native</quarkus.package.type>
+        <quarkus.native.container-build>true</quarkus.native.container-build>
+      </properties>
+    </profile>
   </profiles>
 </project>
