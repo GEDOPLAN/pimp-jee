@@ -13,6 +13,10 @@ mvn package
 +
 and deploy it in some Java EE 8 application server, e. g. WildFly 26.
 +
+The server must offer a datasource with `jdbc/showcase` as JNDI name. You may use the WildFly CLI script `src/main/wildfly/showcase-ds.cli` for adding a matching datasource to your server configuration, but you have to install a driver module for PostgreSQL first (see server documentation).
++
+For demo purposes there is a compose file in `src/main/docker-compose/postgres` for starting a PostgreSQL server at `localhost:5432`.
++
 The small REST api includes an endpoint for retrieving all `Person` objects from the database:
 +
 [source, shell]
@@ -20,9 +24,9 @@ The small REST api includes an endpoint for retrieving all `Person` objects from
 curl localhost:8080/api/persons
 ----
 +
-The in-memory db is populated with a few test entries.
+The db will be populated with a few test entries upon the first request.
 
----
+'''
 
 Migrate from Java EE 8 to Jakarta EE 10::
 +
@@ -37,7 +41,7 @@ You have to adjust `pom.xml` afterwards - please see the comment on top of the p
 +
 You may now deploy the application in an Jakarta EE 10 server, e. g. WildFly 29.
 
----
+'''
 
 Use WildFly as "Jar" Server Runtime::
 +
@@ -64,7 +68,7 @@ The plugin offers a development mode with hot reloading changes:
 mvn -Pwildfly wildfly-jar:dev-watch
 ----
 
----
+'''
 
 Use Quarkus as "Micro" Server Runtime::
 +
