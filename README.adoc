@@ -39,7 +39,7 @@ mvn -PtoJakarta rewrite:run
 +
 You have to adjust `pom.xml` afterwards - please see the comment on top of the profile definition.
 +
-You may now deploy the application in an Jakarta EE 10 server, e. g. WildFly 29.
+You may now deploy the application in an Jakarta EE 10 server, e. g. WildFly 27.
 
 '''
 
