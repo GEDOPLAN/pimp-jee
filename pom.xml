@@ -58,6 +58,20 @@
       <version>1.18.30</version>
       <scope>provided</scope>
     </dependency>
+
+    <!--
+      For "pimping" your application with microprofile features
+      include this dependency
+      (after migrating to Jakarta EE 10)
+    <dependency>
+      <groupId>org.eclipse.microprofile</groupId>
+      <artifactId>microprofile</artifactId>
+      <version>6.0</version>
+      <type>pom</type>
+      <scope>provided</scope>
+    </dependency>
+    -->
+
   </dependencies>
 
   <build>
@@ -115,7 +129,7 @@
       <id>wildfly</id>
       <properties>
         <wildfly.bootable.jar.version>10.0.0.Final</wildfly.bootable.jar.version>
-        <wildfly.version>29.0.1.Final</wildfly.version>
+        <wildfly.version>27.0.1.Final</wildfly.version>
       </properties>
       <build>
         <plugins>
@@ -138,8 +152,12 @@
                 <layer>jaxrs</layer>
                 <layer>cdi</layer>
                 <layer>jpa</layer>
-                <layer>h2-default-datasource</layer>
+
                 <layer>postgresql-driver</layer>
+
+                <layer>microprofile-config</layer>
+                <layer>microprofile-health</layer>
+                <layer>microprofile-metrics</layer>
               </layers>
               <excluded-layers>
                 <layer>deployment-scanner</layer>
@@ -224,13 +242,11 @@
         </dependency>
         <dependency>
           <groupId>io.quarkus</groupId>
-          <artifactId>quarkus-junit5</artifactId>
-          <scope>test</scope>
+          <artifactId>quarkus-smallrye-health</artifactId>
         </dependency>
         <dependency>
-          <groupId>io.rest-assured</groupId>
-          <artifactId>rest-assured</artifactId>
-          <scope>test</scope>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-smallrye-metrics</artifactId>
         </dependency>
       </dependencies>
       <build>
