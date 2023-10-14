@@ -104,10 +104,10 @@
     <!--
     Profile for using WildFly Bootable Jar
     
-    For building an additional WildFly hollow jar, run mvn -pwildfly package,
+    For building an additional WildFly hollow jar, run mvn -Pwildfly package,
     and start the application with java -jar target/wildfly-bootable.jar -&#45;deployment=target/pimp-jee.war.
 
-    Alternativly run the application in Dev Mode: mvn -pwildfly wildfly-jar:dev-watch.
+    Alternativly run the application in Dev Mode: mvn -Pwildfly wildfly-jar:dev-watch.
 
     Note: WildFly 29 is a Jakarta EE 10 server, so you must migrate the project first!
     -->
